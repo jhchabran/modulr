@@ -9,7 +9,7 @@ var modulr = (function(global) {
       _exports = {},
       _oldDir = '',
       _currentDir = '',
-      PREFIX = '__module__', // Prefix identifiers to avoid issues in IE.
+      _hasOwnProperty = ({}).hasOwnProperty,
       RELATIVE_IDENTIFIER_PATTERN = /^\.\.?\//;
   
   function log(str) {
@@ -17,35 +17,35 @@ var modulr = (function(global) {
   }
   
   function require(identifier) {
-    var fn, modObj,
-        id = resolveIdentifier(identifier),
-        key = PREFIX + id,
-        expts = _exports[key];
+    var fn, modObj, expts,
+        id = resolveIdentifier(identifier);
     
     log('Required module "' + identifier + '".');
     
-    if (!expts) {
-      _exports[key] = expts = {};
-      _moduleObjects[key] = modObj = { id: id };
-      
-      if (!require.main) { require.main = modObj; }
-      
-      fn = _modules[key];
-      _oldDir = _currentDir;
-      _currentDir = id.slice(0, id.lastIndexOf('/'));
-      
-      try {
-        if (!fn) { throw 'Can\'t find module "' + identifier + '".'; }
-        if (typeof fn === 'string') {
-          fn = new Function('require', 'exports', 'module', fn);
-        }
-        fn(require, expts, modObj);
-        _currentDir = _oldDir;
-      } catch(e) {
-        _currentDir = _oldDir;
-        // We'd use a finally statement here if it wasn't for IE.
-        throw e;
+    if (_hasOwnProperty.call(_exports, id)) {
+      return _exports[id];
+    }
+    
+    _exports[id] = expts = {};
+    _moduleObjects[id] = modObj = { id: id };
+    
+    if (!require.main) { require.main = modObj; }
+    
+    fn = _modules[id];
+    _oldDir = _currentDir;
+    _currentDir = id.slice(0, id.lastIndexOf('/'));
+    
+    try {
+      if (!fn) { throw 'Can\'t find module "' + identifier + '".'; }
+      if (typeof fn === 'string') {
+        fn = new Function('require', 'exports', 'module', fn);
       }
+      fn(require, expts, modObj);
+      _currentDir = _oldDir;
+    } catch(e) {
+      _currentDir = _oldDir;
+      // We'd use a finally statement here if it wasn't for IE.
+      throw e;
     }
     return expts;
   }
@@ -76,13 +76,11 @@ var modulr = (function(global) {
   }
   
   function cache(id, fn) {
-    var key = PREFIX + id;
-    
     log('Cached module "' + id + '".');
-    if (_modules[key]) {
+    if (_hasOwnProperty.call(_modules, id)) {
       throw 'Can\'t overwrite module "' + id + '".';
     }
-    _modules[key] = fn;
+    _modules[id] = fn;
   }
   
   return {
