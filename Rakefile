@@ -1,6 +1,7 @@
-require 'rubygems'
-require 'rake'
-require 'lib/modulr'
+require 'bundler'
+Bundler::GemHelper.install_tasks
+require 'modulr'
+
 
 COMMONJS_SPEC_DIR = File.join('vendor', 'commonjs', 'tests', 'modules', '1.0')
 
@@ -44,20 +45,4 @@ task :spec do
       puts
     end
   end
-end
-
-begin
-  require "jeweler"
-  Jeweler::Tasks.new do |gemspec|
-    gemspec.name = "modulr"
-    gemspec.summary = "A CommonJS module implementation in Ruby for client-side JavaScript"
-    gemspec.author = "Tobie Langel"
-    gemspec.email = "tobie.langel@gmail.com"
-    gemspec.homepage = "http://github.com/codespeaks/modulr"
-    gemspec.files = FileList["Rakefile", "README.markdown", "LICENSE", "VERSION", "{lib,bin,assets,example}/**/*", "vendor/rkelly/**/*"]
-    gemspec.executable = "modulrize"
-    gemspec.add_dependency("coffee_machine")
-  end
-rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install jeweler"
 end
